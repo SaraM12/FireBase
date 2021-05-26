@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "715665221437",
+    "project_id": "fir-bead7",
+    "storage_bucket": "fir-bead7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715665221437:android:ca8f94ac0fe6e3fd61c754",
+        "android_client_info": {
+          "package_name": "com.example.firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "715665221437-i6095u2o0418cuj68m737dudvbbr4hf0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJaGkw8LUnr5T1048FIK2WhRwjGTWjgiQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "715665221437-i6095u2o0418cuj68m737dudvbbr4hf0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
