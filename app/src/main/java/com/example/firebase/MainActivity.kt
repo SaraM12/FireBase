@@ -3,13 +3,14 @@ package com.example.firebase
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    private lateinit var foregroundOnlyLocationButton: Button
+    private lateinit var foregroundOnlyLocationButton: ImageButton
 
     private lateinit var outputTextView: TextView
 
@@ -60,6 +61,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         foregroundOnlyLocationButton = findViewById(R.id.foreground_only_location_button)
+        foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
+
         outputTextView = findViewById(R.id.output_text_view)
 
         foregroundOnlyLocationButton.setOnClickListener {
@@ -214,9 +217,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private fun updateButtonState(trackingLocation: Boolean) {
         if (trackingLocation) {
-            foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
+            foregroundOnlyLocationButton.setBackgroundColor(Color.GREEN)
+            //foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
         } else {
-            foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
+            foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
+            //foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
         }
     }
 
@@ -240,4 +245,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
     }
+
+
 }

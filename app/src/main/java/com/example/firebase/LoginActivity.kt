@@ -2,67 +2,57 @@ package com.example.firebase
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 
 class LoginActivity : AppCompatActivity() {
 
+    val AUTH_REQUEST_CODE = 100
     private lateinit var auth: FirebaseAuth
+    private lateinit var listener:FirebaseAuth.AuthStateListener
+    private lateinit var  providers:List<AuthUI.IdpConfig>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        auth = Firebase.auth
-
+        signIn()
     }
 
-    fun signIn(view: View) {
-        // [START sign_in_with_email]
-        var email = findViewById<EditText>(R.id.usernameET)
-        var password = findViewById<EditText>(R.id.passwordET)
+    override fun onStart() {
+        super.onStart()
+        auth.addAuthStateListener(listener)
+    }
 
-        auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString())
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithEmail:success")
-                    Toast.makeText(baseContext, "Authentication successful.",
-                        Toast.LENGTH_SHORT).show()
-                    val user = auth.currentUser
-                    updateUI(user)
+    override fun onStop() {
+        FirebaseAuth.getInstance().signOut()
+        auth.removeAuthStateListener(listener)
+        super.onStop()
+    }
 
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                    updateUI(null)
-                }
+    private fun signIn() {
+        providers = arrayListOf(
+            //AuthUI.IdpConfig.GoogleBuilder().build(),
+            AuthUI.IdpConfig.EmailBuilder().build()
+        )
+
+        auth = FirebaseAuth.getInstance()
+        listener = FirebaseAuth.AuthStateListener { p0 ->
+            val user = p0.currentUser
+            if(user != null) {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            } else {
+                startActivityForResult(AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setAvailableProviders(providers)
+                    .setLogo(R.mipmap.ic_launcher_sun)
+                    .setTheme(R.style.LoginTheme)
+                    .build(),AUTH_REQUEST_CODE)
             }
-        // [END sign_in_with_email]
-    }
-
-    private fun updateUI(user: FirebaseUser?) {
-        val intent = Intent(this, MainActivity::class.java)
-        // start your next activity
-        startActivity(intent)
-    }
-
-    private fun reload() {
-
-    }
-
-    companion object {
-        private const val TAG = "EmailPassword"
+        }
     }
 
 }
