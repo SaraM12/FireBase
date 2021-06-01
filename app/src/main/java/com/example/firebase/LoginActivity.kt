@@ -34,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun signIn() {
         providers = arrayListOf(
-            //AuthUI.IdpConfig.GoogleBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build(),
             AuthUI.IdpConfig.EmailBuilder().build()
         )
 

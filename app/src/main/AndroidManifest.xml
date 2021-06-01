@@ -3,7 +3,7 @@
     package="com.example.firebase">
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- Required for foreground services on P+. -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- TODO: Step 1.0, Review Permissions: Specify permissions you are using. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
@@ -14,13 +14,21 @@
         android:roundIcon="@mipmap/ic_launcher_sun_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FireBase">
-        <activity android:name=".LoginActivity">
+        <activity android:name=".HTTPQueryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".LoginActivity">
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
         </activity>
         <activity android:name=".MainActivity">
             <!--
@@ -31,7 +39,7 @@
             </intent-filter>
             -->
         </activity> <!-- Foreground services in Android 10+ require type. -->
-        <!-- TODO: 2.2, Add foreground service type. -->
+
         <service
             android:name=".ForegroundOnlyLocationService"
             android:enabled="true"
