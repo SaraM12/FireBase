@@ -1,6 +1,8 @@
 package com.example.firebase
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.firebase.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -40,18 +42,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
+        //val sydney = LatLng(-34.0, 151.0)
         val myLocation = LatLng(
             intent.getDoubleExtra("lat",0.0),
             intent.getDoubleExtra("lon",0.0))
 
+        val init = intent.getBooleanExtra("init",false)
+        val msg : String
+
+        Log.d("MYLOCATION", "Initialized $init")
+
+        if (init)
+            msg = "Current location"
+        else {
+            msg = "Location"
+            Toast.makeText(this, "Your location is not updated", Toast.LENGTH_SHORT)
+        }
         /*
         val lat = intent.getDoubleExtra("lat",0.0)
         val lon = intent.getDoubleExtra("lon",0.0)
         Log.d("MYLOCATION", "lat "+lat+" lon "+lon)
         */
 
-        mMap.addMarker(MarkerOptions().position(myLocation).title("Current Location"))
+        mMap.addMarker(MarkerOptions().position(myLocation).title(msg))
         //mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation))
     }

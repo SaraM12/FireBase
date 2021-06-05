@@ -1,6 +1,7 @@
 package com.example.firebase
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
 import android.location.Location
@@ -15,13 +16,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
+import java.util.*
+import kotlin.collections.HashMap
 
 private const val TAG = "MainActivity"
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
@@ -45,6 +48,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var queryButton: ImageButton
     private lateinit var queryTextView: TextView
     private lateinit var mapsButton : Button
+    //private lateinit var butSaveCurrent: Button
     private lateinit var location : Location
 
     // Monitors connection to the while-in-use service.
@@ -82,6 +86,21 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         mapsButton.setOnClickListener{
             activityMaps()
         }
+
+        // Reset button listener
+
+        // Reset button listener
+        /*
+        butSaveCurrent = findViewById<View>(R.id.buttonSaveCurrent) as Button
+        butSaveCurrent.setOnClickListener(View.OnClickListener {
+            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+            val myUsersRef = database.reference
+            val d = Date()
+            val sm = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+            val strDate = sm.format(d)
+            myUsersRef.child("botonazos").push().setValue(strDate)
+        })
+        */
 
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
 
@@ -264,7 +283,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private inner class ForegroundOnlyBroadcastReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-             location = intent.getParcelableExtra<Location>(
+             location = intent.getParcelableExtra(
                  ForegroundOnlyLocationService.EXTRA_LOCATION
              )!!
 
@@ -272,6 +291,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 logResultsToScreen("Foreground location: ${location.toText()}")
                 url = "https://api.openuv.io/api/v1/protection?lat="
                 setURL(location)
+                persistData(location)
             }
         }
     }
@@ -283,9 +303,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun executeQuery(){
-        val stringRequest = object: StringRequest(
-            Request.Method.GET, url,
-            Response.Listener<String> { response ->
+        val stringRequest = @SuppressLint("SetTextI18n")
+        object: StringRequest(
+            Method.GET, url,
+            Response.Listener { response ->
                 //textView.text = "Response is: ${response.substring(0, 500)}"
                 //Log.d("A", "Response is: " + response.substring(0,500))
                 val topic = Gson().fromJson(response, Json4Kotlin_Base::class.java)
@@ -304,27 +325,39 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun activityMaps(){
-        var lat : Double
-        var lon : Double
+        val lat : Double
+        val lon : Double
+        val isInitialized: Boolean
 
         if (!::location.isInitialized) {
 
             lat = 40.3894234
             lon = -3.6278847
+            isInitialized = false
             //Log.d("MYLOCATION", "lat "+location.latitude+" lon "+location.longitude)
 
         } else{
             lat = location.latitude
             lon = location.longitude
+            isInitialized = true
         }
 
         val intent = Intent(this, MapsActivity::class.java).apply {
-
-            Log.d("MYLOCATION", "lat "+lat+" lon "+lon)
+            Log.d("MYLOCATION", "lat $lat lon $lon")
             putExtra("lat", lat)
             putExtra("lon", lon)
+            putExtra("init", isInitialized)
         }
         startActivity(intent)
     }
 
+    private fun persistData(location: Location) {
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myUsersRef = database.reference
+        //val d = Date()
+        //val sm = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        //val strDate = sm.format(d)
+        //myUsersRef.child("botonazos").push().setValue(strDate)
+        myUsersRef.child("Location").push().setValue("Latitude ${location.latitude}, longitude ${location.longitude}")
+    }
 }
