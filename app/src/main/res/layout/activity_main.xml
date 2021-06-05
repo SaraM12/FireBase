@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/activity_main"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:layout_margin="16dp">
 
     <!--
     <Button
@@ -24,32 +25,74 @@
 
     <ImageButton
         android:id="@+id/foreground_only_location_button"
+        android:backgroundTint="@android:color/holo_purple"
+        android:background="@drawable/rounded_corners"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/rounded_corners"
         android:padding="10dp"
         android:src="@drawable/outline_place_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        android:contentDescription="@string/enable_gps_button"/>
+
+
+    <ImageButton
+        android:id="@+id/launch_query_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corners"
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:padding="10dp"
+        android:src="@drawable/outline_refresh_24"
+        app:layout_constraintBottom_toTopOf="@+id/output_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.051"
+        app:layout_constraintStart_toEndOf="@+id/foreground_only_location_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        android:contentDescription="@string/launch_http_query"/>
+
 
     <TextView
         android:id="@+id/output_text_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="255dp"
         android:background="@drawable/background_border"
+        android:fontFamily="@font/robotolight"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/foreground_only_location_button" />
+        app:layout_constraintTop_toBottomOf="@+id/foreground_only_location_button"
+        app:layout_constraintVertical_bias="0.08" />
+
+    <TextView
+        android:id="@+id/query_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="255dp"
+        android:background="@drawable/background_border"
+        android:fontFamily="@font/robotolight"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/output_text_view"
+        app:layout_constraintVertical_bias="0.309" />
+
+    <Button
+        android:id="@+id/maps_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/position"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/query_text_view"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

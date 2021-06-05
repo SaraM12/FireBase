@@ -1,6 +1,7 @@
 package com.example.firebase
 
 import android.annotation.SuppressLint
+import android.location.Location
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,8 @@ import com.google.gson.Gson
 
 class HTTPQueryActivity : AppCompatActivity() {
 
+    var url : String = ""
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +24,8 @@ class HTTPQueryActivity : AppCompatActivity() {
         val textView: TextView = findViewById(R.id.text)
 
         val queue: RequestQueue = Volley.newRequestQueue(this)
-        val url = "https://api.openuv.io/api/v1/protection?lat=40.38940677262632&lng=-3.629207340704153"
+        url = "https://api.openuv.io/api/v1/protection?lat="
+        //url = "https://api.openuv.io/api/v1/protection?lat=40.38940677262632&lng=-3.629207340704153"
         //val url = "https://api.openuv.io/api/v1/uv?lat=-23.310755&lng=131.548631"
         //val url = "https://www.google.es"
 
@@ -70,6 +74,10 @@ class HTTPQueryActivity : AppCompatActivity() {
         // Add the request to the RequestQueue.
         queue.add(stringRequest)
 
+    }
+
+    fun setURL(location : Location){
+        url = url.plus(location.latitude.toString()).plus("&lng=").plus(location.longitude)
     }
 
 }

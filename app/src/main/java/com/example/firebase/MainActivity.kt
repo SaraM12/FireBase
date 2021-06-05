@@ -3,19 +3,25 @@ package com.example.firebase
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 
 private const val TAG = "MainActivity"
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
@@ -34,6 +40,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var foregroundOnlyLocationButton: ImageButton
 
     private lateinit var outputTextView: TextView
+    private var url : String = ""
+    private lateinit var queue: RequestQueue
+    private lateinit var queryButton: ImageButton
+    private lateinit var queryTextView: TextView
+    private lateinit var mapsButton : Button
+    private lateinit var location : Location
 
     // Monitors connection to the while-in-use service.
     private val foregroundOnlyServiceConnection = object : ServiceConnection {
@@ -55,13 +67,30 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         setContentView(R.layout.activity_main)
 
+        /*HTTP query variables declaration*/
+        url = "https://api.openuv.io/api/v1/protection?lat="
+
+        queue= Volley.newRequestQueue(this)
+        queryButton = findViewById(R.id.launch_query_button)
+        queryTextView = findViewById(R.id.query_text_view)
+        mapsButton = findViewById(R.id.maps_button)
+
+        queryButton.setOnClickListener{
+            executeQuery()
+        }
+
+        mapsButton.setOnClickListener{
+            activityMaps()
+        }
+
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
 
         sharedPreferences =
             getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         foregroundOnlyLocationButton = findViewById(R.id.foreground_only_location_button)
-        foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
+        foregroundOnlyLocationButton.setImageResource(R.drawable.outline_location_off_24)
+        //foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
 
         outputTextView = findViewById(R.id.output_text_view)
 
@@ -214,10 +243,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private fun updateButtonState(trackingLocation: Boolean) {
         if (trackingLocation) {
-            foregroundOnlyLocationButton.setBackgroundColor(Color.GREEN)
+            //foregroundOnlyLocationButton.setBackgroundColor(Color.GREEN)
+            foregroundOnlyLocationButton.setImageResource(R.drawable.outline_place_24)
             //foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
         } else {
-            foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
+            //foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
+            foregroundOnlyLocationButton.setImageResource(R.drawable.outline_location_off_24)
             //foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
         }
     }
@@ -233,15 +264,67 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private inner class ForegroundOnlyBroadcastReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            val location = intent.getParcelableExtra<Location>(
-                ForegroundOnlyLocationService.EXTRA_LOCATION
-            )
+             location = intent.getParcelableExtra<Location>(
+                 ForegroundOnlyLocationService.EXTRA_LOCATION
+             )!!
 
-            if (location != null) {
+            if (::location.isInitialized) {
                 logResultsToScreen("Foreground location: ${location.toText()}")
+                url = "https://api.openuv.io/api/v1/protection?lat="
+                setURL(location)
             }
         }
     }
 
+    fun setURL(location : Location){
+        url = url.plus(location.latitude.toString()).plus("&lng=").plus(location.longitude.toString())
+        Log.d("MIURL", url)
+        //executeQuery()
+    }
+
+    private fun executeQuery(){
+        val stringRequest = object: StringRequest(
+            Request.Method.GET, url,
+            Response.Listener<String> { response ->
+                //textView.text = "Response is: ${response.substring(0, 500)}"
+                //Log.d("A", "Response is: " + response.substring(0,500))
+                val topic = Gson().fromJson(response, Json4Kotlin_Base::class.java)
+                queryTextView.text =  topic.result.from_time +"\n" + topic.result.from_uv +"\n" + topic.result.to_time +"\n" + topic.result.to_uv
+            },
+            Response.ErrorListener {  })
+        {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["x-access-token"] = "17ee934bcd028a2a82bd151018cd951e"
+                return headers
+            }
+        }
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest)
+    }
+
+    private fun activityMaps(){
+        var lat : Double
+        var lon : Double
+
+        if (!::location.isInitialized) {
+
+            lat = 40.3894234
+            lon = -3.6278847
+            //Log.d("MYLOCATION", "lat "+location.latitude+" lon "+location.longitude)
+
+        } else{
+            lat = location.latitude
+            lon = location.longitude
+        }
+
+        val intent = Intent(this, MapsActivity::class.java).apply {
+
+            Log.d("MYLOCATION", "lat "+lat+" lon "+lon)
+            putExtra("lat", lat)
+            putExtra("lon", lon)
+        }
+        startActivity(intent)
+    }
 
 }

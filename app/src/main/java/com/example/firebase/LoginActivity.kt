@@ -51,6 +51,7 @@ class LoginActivity : AppCompatActivity() {
                     .setLogo(R.mipmap.ic_launcher_sun)
                     .setTheme(R.style.LoginTheme)
                     .build(),AUTH_REQUEST_CODE)
+
             }
         }
     }
