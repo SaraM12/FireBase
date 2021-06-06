@@ -47,7 +47,6 @@
         android:backgroundTint="@android:color/holo_blue_light"
         android:padding="10dp"
         android:src="@drawable/outline_refresh_24"
-        app:layout_constraintBottom_toTopOf="@+id/output_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.051"
         app:layout_constraintStart_toEndOf="@+id/foreground_only_location_button"
@@ -56,6 +55,7 @@
         android:contentDescription="@string/launch_http_query"/>
 
 
+    <!--
     <TextView
         android:id="@+id/output_text_view"
         android:layout_width="match_parent"
@@ -69,20 +69,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/foreground_only_location_button"
         app:layout_constraintVertical_bias="0.08" />
+    -->
+
+    <TextView
+        android:id="@+id/last_update_TV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_border"
+        android:fontFamily="@font/robotolight"
+        app:layout_constraintBottom_toTopOf="@+id/query_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/launch_query_button"
+        android:padding="5dp"/>
 
     <TextView
         android:id="@+id/query_text_view"
         android:layout_width="match_parent"
-        android:layout_height="255dp"
+        android:layout_height="355dp"
         android:background="@drawable/background_border"
         android:fontFamily="@font/robotolight"
-        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/output_text_view"
-        app:layout_constraintVertical_bias="0.309" />
+        app:layout_constraintTop_toBottomOf="@+id/launch_query_button"
+        app:layout_constraintVertical_bias="0.25"
+        android:padding="10dp"/>
 
     <Button
         android:id="@+id/maps_button"
@@ -93,7 +106,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/query_text_view"
-        app:layout_constraintVertical_bias="0.466" />
+        app:layout_constraintVertical_bias="0.449" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

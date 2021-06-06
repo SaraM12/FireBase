@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
+import android.hardware.SensorManager
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -23,6 +24,7 @@ import com.android.volley.toolbox.Volley
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -42,14 +44,20 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private lateinit var foregroundOnlyLocationButton: ImageButton
 
-    private lateinit var outputTextView: TextView
+    //private lateinit var outputTextView: TextView
     private var url : String = ""
     private lateinit var queue: RequestQueue
     private lateinit var queryButton: ImageButton
     private lateinit var queryTextView: TextView
+    private lateinit var lastUpdateTextView: TextView
     private lateinit var mapsButton : Button
-    //private lateinit var butSaveCurrent: Button
     private lateinit var location : Location
+    private lateinit var sensorManager: SensorManager
+    private lateinit var accelerometer : Accelerometer
+
+    private lateinit var d :Date
+    private lateinit var sm : SimpleDateFormat
+    private lateinit var strDate : String
 
     // Monitors connection to the while-in-use service.
     private val foregroundOnlyServiceConnection = object : ServiceConnection {
@@ -77,6 +85,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         queue= Volley.newRequestQueue(this)
         queryButton = findViewById(R.id.launch_query_button)
         queryTextView = findViewById(R.id.query_text_view)
+        lastUpdateTextView = findViewById(R.id.last_update_TV)
         mapsButton = findViewById(R.id.maps_button)
 
         queryButton.setOnClickListener{
@@ -87,7 +96,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             activityMaps()
         }
 
-        // Reset button listener
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = Accelerometer(sensorManager)
+
+        d = Date()
+        sm = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
 
         // Reset button listener
         /*
@@ -111,7 +124,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         foregroundOnlyLocationButton.setImageResource(R.drawable.outline_location_off_24)
         //foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
 
-        outputTextView = findViewById(R.id.output_text_view)
+        //outputTextView = findViewById(R.id.output_text_view)
 
         foregroundOnlyLocationButton.setOnClickListener {
             val enabled = sharedPreferences.getBoolean(
@@ -272,10 +285,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    /*
     private fun logResultsToScreen(output: String) {
         val outputWithPreviousLogs = "$output\n${outputTextView.text}"
         outputTextView.text = outputWithPreviousLogs
     }
+    */
 
     /**
      * Receiver for location broadcasts from [ForegroundOnlyLocationService].
@@ -288,7 +303,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
              )!!
 
             if (::location.isInitialized) {
-                logResultsToScreen("Foreground location: ${location.toText()}")
+                //logResultsToScreen("Foreground location: ${location.toText()}")
                 url = "https://api.openuv.io/api/v1/protection?lat="
                 setURL(location)
                 persistData(location)
@@ -308,8 +323,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             Method.GET, url,
             Response.Listener { response ->
                 //textView.text = "Response is: ${response.substring(0, 500)}"
-                //Log.d("A", "Response is: " + response.substring(0,500))
+                Log.d("MYQUERY", "Query ejecutada")
                 val topic = Gson().fromJson(response, Json4Kotlin_Base::class.java)
+                d = Date()
+                strDate = sm.format(d)
+                lastUpdateTextView.text = "Last updated at $strDate"
                 queryTextView.text =  topic.result.from_time +"\n" + topic.result.from_uv +"\n" + topic.result.to_time +"\n" + topic.result.to_uv
             },
             Response.ErrorListener {  })
@@ -354,10 +372,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private fun persistData(location: Location) {
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val myUsersRef = database.reference
-        //val d = Date()
-        //val sm = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-        //val strDate = sm.format(d)
+        d = Date()
+        strDate = sm.format(d)
         //myUsersRef.child("botonazos").push().setValue(strDate)
-        myUsersRef.child("Location").push().setValue("Latitude ${location.latitude}, longitude ${location.longitude}")
+        myUsersRef.child("Location").push().setValue("$strDate - Latitude ${location.latitude}, longitude ${location.longitude}")
     }
 }
