@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.firebase">
+    package="com.saram.ruvxposed">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FireBase">
         <activity
-            android:name=".SplashScreen"
+            android:name="com.saram.ruvxposed.SplashScreen"
             android:label="@string/title_activity_splash_screen"
             android:theme="@style/Theme.FireBase.NoActionBar"></activity>
 
@@ -40,16 +40,16 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name="com.saram.ruvxposed.MapsActivity"
             android:theme="@style/Theme.FireBase.NoActionBar" />
-        <activity android:name=".LoginActivity">
+        <activity android:name="com.saram.ruvxposed.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.saram.ruvxposed.MainActivity">
 
             <!--
             <intent-filter>
@@ -60,7 +60,7 @@
             -->
         </activity> <!-- Foreground services in Android 10+ require type. -->
         <service
-            android:name=".ForegroundOnlyLocationService"
+            android:name="com.saram.ruvxposed.ForegroundOnlyLocationService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />

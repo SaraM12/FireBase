@@ -1,4 +1,4 @@
-package com.example.firebase
+package com.saram.ruvxposed
 
 import org.junit.Test
 
