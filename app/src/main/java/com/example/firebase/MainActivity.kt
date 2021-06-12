@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     //private lateinit var outputTextView: TextView
     private var url : String = ""
+    private var urlDay : String = ""
     private lateinit var queue: RequestQueue
     private lateinit var queryButton: ImageButton
     private lateinit var queryTextView: TextView
@@ -58,6 +59,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var d :Date
     private lateinit var sm : SimpleDateFormat
     private lateinit var strDate : String
+    private lateinit var result : Result
+    private lateinit var dayResult: DayResult
 
     // Monitors connection to the while-in-use service.
     private val foregroundOnlyServiceConnection = object : ServiceConnection {
@@ -81,6 +84,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         /*HTTP query variables declaration*/
         url = "https://api.openuv.io/api/v1/protection?lat="
+        urlDay =  "https://api.openuv.io/api/v1/uv?lat="
 
         queue= Volley.newRequestQueue(this)
         queryButton = findViewById(R.id.launch_query_button)
@@ -89,7 +93,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         mapsButton = findViewById(R.id.maps_button)
 
         queryButton.setOnClickListener{
-            executeQuery()
+            executeDailyQuery()
         }
 
         mapsButton.setOnClickListener{
@@ -102,19 +106,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         d = Date()
         sm = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
 
-        // Reset button listener
-        /*
-        butSaveCurrent = findViewById<View>(R.id.buttonSaveCurrent) as Button
-        butSaveCurrent.setOnClickListener(View.OnClickListener {
-            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-            val myUsersRef = database.reference
-            val d = Date()
-            val sm = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-            val strDate = sm.format(d)
-            myUsersRef.child("botonazos").push().setValue(strDate)
-        })
-        */
-
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
 
         sharedPreferences =
@@ -122,9 +113,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         foregroundOnlyLocationButton = findViewById(R.id.foreground_only_location_button)
         foregroundOnlyLocationButton.setImageResource(R.drawable.outline_location_off_24)
-        //foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
-
-        //outputTextView = findViewById(R.id.output_text_view)
 
         foregroundOnlyLocationButton.setOnClickListener {
             val enabled = sharedPreferences.getBoolean(
@@ -133,7 +121,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             if (enabled) {
                 foregroundOnlyLocationService?.unsubscribeToLocationUpdates()
             } else {
-                // TODO: Step 1.0, Review Permissions: Checks and requests if needed.
                 if (foregroundPermissionApproved()) {
                     foregroundOnlyLocationService?.subscribeToLocationUpdates()
                         ?: Log.d(TAG, "Service Not Bound")
@@ -285,12 +272,29 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
-    /*
-    private fun logResultsToScreen(output: String) {
-        val outputWithPreviousLogs = "$output\n${outputTextView.text}"
-        outputTextView.text = outputWithPreviousLogs
+
+    private fun logResultsToScreen() {
+        var level = ""
+        if (result.result.uv < 3)
+            level = "low"
+        else if (3 <= result.result.uv && result.result.uv < 6)
+            level = "moderate"
+        else if (6 <= result.result.uv && result.result.uv < 8)
+            level = "high"
+        else if (8 <= result.result.uv && result.result.uv < 11)
+            level = "very high"
+        else if (11 <= result.result.uv)
+            level = "extremely high"
+
+        val auxString = "You are currently being Xposed to ${result.result.uv} which is a " + level +"level. " +
+                "\nPlease, make sure you are protected from ${dayResult.result.from_time.drop(11).dropLast(5)} to " +
+                "${dayResult.result.to_time.drop(11).dropLast(5)}. \n\n" +
+                "Today's highest level will be ${result.result.uv_max} at ${result.result.uv_max_time}." +
+                "\n PROTECT YOUR SKIN!!"
+
+        queryTextView.text = auxString
     }
-    */
+
 
     /**
      * Receiver for location broadcasts from [ForegroundOnlyLocationService].
@@ -305,6 +309,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             if (::location.isInitialized) {
                 //logResultsToScreen("Foreground location: ${location.toText()}")
                 url = "https://api.openuv.io/api/v1/protection?lat="
+                urlDay =  "https://api.openuv.io/api/v1/uv?lat="
                 setURL(location)
                 persistData(location)
             }
@@ -313,22 +318,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     fun setURL(location : Location){
         url = url.plus(location.latitude.toString()).plus("&lng=").plus(location.longitude.toString())
+        urlDay = urlDay.plus(location.latitude.toString()).plus("&lng=").plus(location.longitude.toString())
         Log.d("MIURL", url)
+        Log.d("MIURL", urlDay)
         //executeQuery()
+        executeDailyQuery()
     }
 
     private fun executeQuery(){
         val stringRequest = @SuppressLint("SetTextI18n")
         object: StringRequest(
-            Method.GET, url,
+            Method.GET, urlDay,
             Response.Listener { response ->
                 //textView.text = "Response is: ${response.substring(0, 500)}"
-                Log.d("MYQUERY", "Query ejecutada")
-                val topic = Gson().fromJson(response, Json4Kotlin_Base::class.java)
+                result = Gson().fromJson(response, Result::class.java)
+                Log.d("MYQUERY", "${result.result.uv}")
                 d = Date()
                 strDate = sm.format(d)
                 lastUpdateTextView.text = "Last updated at $strDate"
-                queryTextView.text =  topic.result.from_time +"\n" + topic.result.from_uv +"\n" + topic.result.to_time +"\n" + topic.result.to_uv
+                queryTextView.text =  "${result.result.uv}"
             },
             Response.ErrorListener {  })
         {
@@ -340,6 +348,54 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
         // Add the request to the RequestQueue.
         queue.add(stringRequest)
+    }
+
+    private fun executeDailyQuery(){
+        val stringRequest = @SuppressLint("SetTextI18n")
+
+        object: StringRequest(
+            Method.GET, urlDay,
+            Response.Listener { response ->
+                //textView.text = "Response is: ${response.substring(0, 500)}"
+                result = Gson().fromJson(response, Result::class.java)
+                Log.d("MYQUERY", "RESUELVO urlDay")
+                d = Date()
+                strDate = sm.format(d)
+                lastUpdateTextView.text = "Last updated at $strDate"
+                //queryTextView.text =  "${result.result.uv}"
+            },
+            Response.ErrorListener {  })
+        {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["x-access-token"] = "17ee934bcd028a2a82bd151018cd951e"
+                return headers
+            }
+        }
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest)
+
+        val stringRequest2 = @SuppressLint("SetTextI18n")
+        object: StringRequest(
+            Method.GET, url,
+            Response.Listener { response ->
+                //textView.text = "Response is: ${response.substring(0, 500)}"
+                dayResult = Gson().fromJson(response, DayResult::class.java)
+                Log.d("MYQUERY", "RESUELVO URL")
+                //queryTextView.text =  queryTextView.text.toString() + "\n" + dayResult.result.from_time.toString()
+                logResultsToScreen()
+            },
+            Response.ErrorListener {  })
+        {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["x-access-token"] = "17ee934bcd028a2a82bd151018cd951e"
+                return headers
+            }
+        }
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest2)
     }
 
     private fun activityMaps(){

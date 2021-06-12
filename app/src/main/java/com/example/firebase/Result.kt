@@ -1,21 +1,52 @@
 package com.example.firebase
-/*
-Copyright (c) 2021 Kotlin Data Classes Generated from JSON powered by http://www.json2kotlin.com
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+data class Result(
+    val result: Result
+) {
+    data class Result(
+        val ozone: Double,
+        val ozone_time: String,
+        val safe_exposure_time: SafeExposureTime,
+        val sun_info: SunInfo,
+        val uv: Double,
+        val uv_max: Double,
+        val uv_max_time: String,
+        val uv_time: String
+    ) {
+        data class SafeExposureTime(
+            val st1: Int,
+            val st2: Int,
+            val st3: Int,
+            val st4: Int,
+            val st5: Int,
+            val st6: Int
+        )
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+        data class SunInfo(
+            val sun_position: SunPosition,
+            val sun_times: SunTimes
+        ) {
+            data class SunPosition(
+                val altitude: Double,
+                val azimuth: Double
+            )
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
-
-
-import com.google.gson.annotations.SerializedName
-data class Result (
-
-	@SerializedName("from_time") val from_time : String,
-	@SerializedName("from_uv") val from_uv : Double,
-	@SerializedName("to_time") val to_time : String,
-	@SerializedName("to_uv") val to_uv : Double
-)
+            data class SunTimes(
+                val dawn: String,
+                val dusk: String,
+                val goldenHour: String,
+                val goldenHourEnd: String,
+                val nadir: String,
+                val nauticalDawn: String,
+                val nauticalDusk: String,
+                val night: String,
+                val nightEnd: String,
+                val solarNoon: String,
+                val sunrise: String,
+                val sunriseEnd: String,
+                val sunset: String,
+                val sunsetStart: String
+            )
+        }
+    }
+}

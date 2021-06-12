@@ -3,5 +3,7 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/robotolight" />
+        android:font="@font/robotolight"
+        android:color= "@color/white"/>
+
 </font-family>

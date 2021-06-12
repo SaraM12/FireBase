@@ -19,6 +19,10 @@
         android:roundIcon="@mipmap/ic_launcher_sun_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FireBase">
+        <activity
+            android:name=".SplashScreen"
+            android:label="@string/title_activity_splash_screen"
+            android:theme="@style/Theme.FireBase.NoActionBar"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -35,9 +39,18 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
-        <activity android:name=".MapsActivity" android:theme="@style/Theme.FireBase.NoActionBar"/>
-
+        <activity
+            android:name=".MapsActivity"
+            android:theme="@style/Theme.FireBase.NoActionBar" />
         <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity">
+
             <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,13 +58,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             -->
-        </activity>
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity> <!-- Foreground services in Android 10+ require type. -->
         <service
             android:name=".ForegroundOnlyLocationService"
@@ -59,4 +65,5 @@
             android:exported="false"
             android:foregroundServiceType="location" />
     </application>
+
 </manifest>
