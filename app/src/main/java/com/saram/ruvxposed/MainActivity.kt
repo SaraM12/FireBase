@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private lateinit var foregroundOnlyLocationButton: ImageButton
 
-    //private lateinit var outputTextView: TextView
     private var url : String = ""
     private var urlDay : String = ""
     private lateinit var queue: RequestQueue
@@ -274,40 +273,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private fun updateButtonState(trackingLocation: Boolean) {
         if (trackingLocation) {
-            //foregroundOnlyLocationButton.setBackgroundColor(Color.GREEN)
             foregroundOnlyLocationButton.setImageResource(R.drawable.outline_place_24)
-            //foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
         } else {
-            //foregroundOnlyLocationButton.setBackgroundColor(Color.RED)
             foregroundOnlyLocationButton.setImageResource(R.drawable.outline_location_off_24)
-            //foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
         }
     }
-
-
-    private fun logResultsToScreen() {
-        Log.d("MYQUERY", "VOY A ESCRIBIR!!!!")
-
-        var level = ""
-        if (result.result.uv < 3)
-            level = "low"
-        else if (3 <= result.result.uv && result.result.uv < 6)
-            level = "moderate"
-        else if (6 <= result.result.uv && result.result.uv < 8)
-            level = "high"
-        else if (8 <= result.result.uv && result.result.uv < 11)
-            level = "very high"
-        else if (11 <= result.result.uv)
-            level = "extremely high"
-
-        val auxString = "You are currently being Xposed to ${result.result.uv} which is a " + level +"level. " +
-                "\nPlease, make sure you are protected from ${dayResult.result.from_time.drop(11).dropLast(5)} to " +
-                "${dayResult.result.to_time.drop(11).dropLast(5)}. \n\n" +
-                "Today's highest level will be ${result.result.uv_max} at ${result.result.uv_max_time}." +
-                "\n PROTECT YOUR SKIN!!"
-
-    }
-
 
     /**
      * Receiver for location broadcasts from [ForegroundOnlyLocationService].
@@ -331,8 +301,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     fun setURL(location : Location){
         url = url.plus(location.latitude.toString()).plus("&lng=").plus(location.longitude.toString())
         urlDay = urlDay.plus(location.latitude.toString()).plus("&lng=").plus(location.longitude.toString())
-        Log.d("MIURL", url)
-        Log.d("MIURL", urlDay)
+
         executeQuery()
         executeDailyQuery()
     }
@@ -342,9 +311,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         object: StringRequest(
             Method.GET, urlDay,
             Response.Listener { response ->
-                //textView.text = "Response is: ${response.substring(0, 500)}"
+
                 result = Gson().fromJson(response, Result::class.java)
-                Log.d("MYQUERY", "${result.result.uv}")
                 d = Date()
                 strDate = sm.format(d)
                 lastUpdateTextView.text = "Last updated at ${strDate.drop(11)}"
@@ -385,13 +353,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         object: StringRequest(
             Method.GET, url,
             Response.Listener { response ->
-                //textView.text = "Response is: ${response.substring(0, 500)}"
                 dayResult = Gson().fromJson(response, DayResult::class.java)
-                Log.d("MYQUERY", "RESUELVO URL")
                 fromTime.text = dayResult.result.from_time.drop(11).dropLast(5)
                 toTime.text = dayResult.result.to_time.drop(11).dropLast(5)
-                //queryTextView.text =  queryTextView.text.toString() + "\n" + dayResult.result.from_time.toString()
-                //logResultsToScreen()
             },
             Response.ErrorListener {  })
         {
@@ -415,8 +379,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             lat = 40.3894234
             lon = -3.6278847
             isInitialized = false
-            //Log.d("MYLOCATION", "lat "+location.latitude+" lon "+location.longitude)
-
         } else{
             lat = location.latitude
             lon = location.longitude
@@ -424,7 +386,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
 
         val intent = Intent(this, MapsActivity::class.java).apply {
-            Log.d("MYLOCATION", "lat $lat lon $lon")
             putExtra("lat", lat)
             putExtra("lon", lon)
             putExtra("init", isInitialized)
@@ -437,7 +398,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val myUsersRef = database.reference
         d = Date()
         strDate = sm.format(d)
-        //myUsersRef.child("botonazos").push().setValue(strDate)
+
         myUsersRef.child("Location").push().setValue("$strDate - Latitude ${location.latitude}, longitude ${location.longitude}")
     }
 }
