@@ -49,8 +49,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private var urlDay : String = ""
     private lateinit var queue: RequestQueue
     private lateinit var queryButton: ImageButton
-    private lateinit var queryTextView: TextView
+    private lateinit var currentUV: TextView
+    private lateinit var fromTime: TextView
+    private lateinit var toTime: TextView
+    private lateinit var maxLevel: TextView
+    private lateinit var maxLevelTime: TextView
     private lateinit var lastUpdateTextView: TextView
+    private lateinit var uvLevelDescription: TextView
     private lateinit var mapsButton : Button
     private lateinit var location : Location
     private lateinit var sensorManager: SensorManager
@@ -88,7 +93,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         queue= Volley.newRequestQueue(this)
         queryButton = findViewById(R.id.launch_query_button)
-        queryTextView = findViewById(R.id.query_text_view)
+
+        currentUV  = findViewById(R.id.uv_level_value_TV)
+        fromTime  = findViewById(R.id.uv_from_value_TV)
+        toTime = findViewById(R.id.uv_to_value_TV)
+        maxLevel = findViewById(R.id.uv_max_value_TV)
+        maxLevelTime  = findViewById(R.id.uv_max_time_value_TV)
+        uvLevelDescription = findViewById(R.id.level_TV)
+
         lastUpdateTextView = findViewById(R.id.last_update_TV)
         mapsButton = findViewById(R.id.maps_button)
 
@@ -274,6 +286,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
 
     private fun logResultsToScreen() {
+        Log.d("MYQUERY", "VOY A ESCRIBIR!!!!")
+
         var level = ""
         if (result.result.uv < 3)
             level = "low"
@@ -292,7 +306,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 "Today's highest level will be ${result.result.uv_max} at ${result.result.uv_max_time}." +
                 "\n PROTECT YOUR SKIN!!"
 
-        queryTextView.text = auxString
     }
 
 
@@ -307,7 +320,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
              )!!
 
             if (::location.isInitialized) {
-                //logResultsToScreen("Foreground location: ${location.toText()}")
                 url = "https://api.openuv.io/api/v1/protection?lat="
                 urlDay =  "https://api.openuv.io/api/v1/uv?lat="
                 setURL(location)
@@ -321,7 +333,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         urlDay = urlDay.plus(location.latitude.toString()).plus("&lng=").plus(location.longitude.toString())
         Log.d("MIURL", url)
         Log.d("MIURL", urlDay)
-        //executeQuery()
+        executeQuery()
         executeDailyQuery()
     }
 
@@ -335,8 +347,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 Log.d("MYQUERY", "${result.result.uv}")
                 d = Date()
                 strDate = sm.format(d)
-                lastUpdateTextView.text = "Last updated at $strDate"
-                queryTextView.text =  "${result.result.uv}"
+                lastUpdateTextView.text = "Last updated at ${strDate.drop(11)}"
+
+                var aux_level = ""
+                if (result.result.uv < 3)
+                    aux_level = "low"
+                else if (3 <= result.result.uv && result.result.uv < 6)
+                    aux_level = "moderate"
+                else if (6 <= result.result.uv && result.result.uv < 8)
+                    aux_level = "high"
+                else if (8 <= result.result.uv && result.result.uv < 11)
+                    aux_level = "very high"
+                else if (11 <= result.result.uv)
+                    aux_level = "extremely high"
+
+                currentUV.text = result.result.uv.toString()
+                maxLevel.text = result.result.uv_max.toString()
+                maxLevelTime.text = result.result.uv_max_time.drop(11).dropLast(5)
+                uvLevelDescription.text = "You are currently Xposed to a $aux_level level of uv radiation."
+
             },
             Response.ErrorListener {  })
         {
@@ -354,37 +383,15 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val stringRequest = @SuppressLint("SetTextI18n")
 
         object: StringRequest(
-            Method.GET, urlDay,
-            Response.Listener { response ->
-                //textView.text = "Response is: ${response.substring(0, 500)}"
-                result = Gson().fromJson(response, Result::class.java)
-                Log.d("MYQUERY", "RESUELVO urlDay")
-                d = Date()
-                strDate = sm.format(d)
-                lastUpdateTextView.text = "Last updated at $strDate"
-                //queryTextView.text =  "${result.result.uv}"
-            },
-            Response.ErrorListener {  })
-        {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["x-access-token"] = "17ee934bcd028a2a82bd151018cd951e"
-                return headers
-            }
-        }
-
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest)
-
-        val stringRequest2 = @SuppressLint("SetTextI18n")
-        object: StringRequest(
             Method.GET, url,
             Response.Listener { response ->
                 //textView.text = "Response is: ${response.substring(0, 500)}"
                 dayResult = Gson().fromJson(response, DayResult::class.java)
                 Log.d("MYQUERY", "RESUELVO URL")
+                fromTime.text = dayResult.result.from_time.drop(11).dropLast(5)
+                toTime.text = dayResult.result.to_time.drop(11).dropLast(5)
                 //queryTextView.text =  queryTextView.text.toString() + "\n" + dayResult.result.from_time.toString()
-                logResultsToScreen()
+                //logResultsToScreen()
             },
             Response.ErrorListener {  })
         {
@@ -395,7 +402,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
         // Add the request to the RequestQueue.
-        queue.add(stringRequest2)
+        queue.add(stringRequest)
     }
 
     private fun activityMaps(){

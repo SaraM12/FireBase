@@ -19,10 +19,16 @@
         android:roundIcon="@mipmap/ic_launcher_sun_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FireBase">
-        <activity
-            android:name="com.saram.ruvxposed.SplashScreen"
-            android:label="@string/title_activity_splash_screen"
-            android:theme="@style/Theme.FireBase.NoActionBar"></activity>
+        <activity android:name=".SplashScreenActivity"
+            android:theme="@style/SplashScreenTheme">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -40,17 +46,20 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name="com.saram.ruvxposed.MapsActivity"
+            android:name=".MapsActivity"
             android:theme="@style/Theme.FireBase.NoActionBar" />
-        <activity android:name="com.saram.ruvxposed.LoginActivity">
+
+        <activity android:name=".LoginActivity">
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
         </activity>
-        <activity android:name="com.saram.ruvxposed.MainActivity">
 
+        <activity android:name=".MainActivity">
             <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,7 +69,7 @@
             -->
         </activity> <!-- Foreground services in Android 10+ require type. -->
         <service
-            android:name="com.saram.ruvxposed.ForegroundOnlyLocationService"
+            android:name=".ForegroundOnlyLocationService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />

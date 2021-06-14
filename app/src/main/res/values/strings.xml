@@ -34,5 +34,16 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="current_uv_level">Current UV level:</string>
+    <string name="uv_level_description">UV level description</string>
+    <string name="from">From:</string>
+    <string name="be_protected_from">Be protected from</string>
+    <string name="to">To:</string>
+    <string name="be_protected_until">Be protected until</string>
+    <string name="todays_max_uv">Todays\' max uv:</string>
+    <string name="uv_max_level">UV max level</string>
+    <string name="max_uv_time">Max uv time:</string>
+    <string name="uv_max_level_time">UV max level time</string>
+    <string name="last_update">Last update</string>
 
 </resources>
