@@ -104,6 +104,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         mapsButton = findViewById(R.id.maps_button)
 
         queryButton.setOnClickListener{
+            executeQuery()
             executeDailyQuery()
         }
 
